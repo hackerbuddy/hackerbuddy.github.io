@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Gamedev Canvas Workshop</title>
+    <style>
+    	* { padding: 0; margin: 0; }
+    	canvas { background: #eee; display: block; margin: 0 auto; }
+        p{
+            padding-left: 20;
+        }
+        div{
+            padding: 30; 
+        }
+        .inline{
+            display: inline;
+            padding: 20px;
+        }
+        .display{
+            text-align: center;
+        }
+        .button{
+            font-size: 26;
+        }
+    </style>
+</head>
+<body>
+<div style="center">
+<canvas id="myCanvas" width="480" height="320"></canvas>
+
+<div class="display">
+
+    <button onclick="resetGame()">Reset</button>
+    <button id="pause" onclick="pause()">Pause</button>
+    <p id="score" class="inline"> PlayerScore: 0 </p>
+    <p id="botScore" class="inline"> botScore: 0 </p>
+    <p id="highScore" class="inline"> Highscore: 0 </p>
+    <div> IOS controls</div>
+    <div>
+    <button onclick="left()" class="button"> Left </button>
+    <button onclick="right()" class="button"> Right </button>
+    <button onclick="shoot()" class="button"> ? </button>    
+    </div>
+</div>
+     <div>
+    <p id="text" padding= 50 ></p>  
+    </div>
+    </div>
+
+        
+<script>
+ 
+    
+var canvas = document.getElementById("myCanvas");
+var ctx = canvas.getContext("2d");
+
+    
+x= canvas.width-15; 
+y= 25;
+    
+dx= 2;
+dy= 2;
+
+var ballRadius = 10;
+var paddleHeight = 10;
+var botPaddleHeight = 10;    
+var paddleWidth = 60;
+var paddleX= (canvas.width-paddleWidth)/2;
+var paddleY= (canvas.height-paddleHeight);
+var botpaddleX= (canvas.width-paddleWidth)/2;
+var botpaddleY= 0
+var rightPressed = false;
+var leftPressed  = false;
+var upPressed = false;
+var downPressed = false;
+var ctrlPressed = false;
+var points= 0;
+var botPoints =0;
+var botColor= "#cc66ff";
+var highScoreCounter= 0;    
+var highScore= -1;
+var temp=0;
+var tempdx;
+var tempdy;
+var pauseAlreadyClicked= 0;
+//Sounds//
+var gunshotSound = new Audio("gunshot.wav"); // buffers automatically when created
+var groanSound= new Audio("grunt.mp3");
+var deathGurgle= new Audio("scream.mp3");
+var xfiles= new Audio("xfiles.mp3");
+var buzzerSound= new Audio("buzzer.mp3");    
+    
+var reloadCounter= 0;
+var gunReloaded= false;
+
+var bulletX= canvas.width/2; 
+var bulletY= canvas.height;
+var bulletAlive= false;
+var botAlive= true;
+var instructions= true;
+var alpha= 1.0;    
+var alphahalf=1.0;
+var alpha2=1.0;    
+var nahFuckItLoop= false;
+var text1Timer= 0;
+var text2Timer= 0;
+var botDmgTimer= 0;
+    
+function left(){
+    rightPressed= false;
+    leftPressed= true;
+}
+   
+ 
+function right(){
+    leftPressed= false;
+    rightPressed= true;
+}   
+    
+function shoot(){
+    ctrlPressed= true;
+    drawPaddle();
+    
+}
+    
+function pause(){
+     if (pauseAlreadyClicked){
+        dx= tempdx;
+        dy= tempdy;
+        document.getElementById("pause").innerHTML = "Pause";
+         pauseAlreadyClicked= 0;
+      }
+    else{
+    ctrlPressed= false;
+    tempdx= dx;
+    tempdy= dy;
+    dx= 0;
+    dy= 0;      
+    pauseAlreadyClicked= 1;
+    document.getElementById("pause").innerHTML = "Play";
+        }
+}
+
+    
+function resetGame(){
+   paddleX= (canvas.width-paddleWidth)/2;
+   paddleY= (canvas.height-paddleHeight);
+   botpaddleX= (canvas.width-paddleWidth)/2;
+   botpaddleY= 0;   
+   botPaddleHeight=10;
+   x= canvas.width-35; 
+   y= 25;    
+   draw();
+   points = 0;
+   botPoints=0;
+   document.getElementById("score").innerHTML = "PlayerScore: " + points;
+   document.getElementById("botScore").innerHTML = "botScore: " + botPoints;
+   document.getElementById("text").innerHTML = "";
+   dx= 2;
+   dy= 2;    
+}    
+function wonPointReset(){
+   buzzerSound.play();
+   paddleX= (canvas.width-paddleWidth)/2;
+   paddleY= (canvas.height-paddleHeight);
+   botpaddleX= (canvas.width-paddleWidth)/2;
+   botpaddleY= 0   
+   x= canvas.width-35; 
+   y= 25;    
+   draw();
+   document.getElementById("score").innerHTML = "PlayerScore: " + points;
+   document.getElementById("botScore").innerHTML = "botScore: " + botPoints;
+   document.getElementById("text").innerHTML = "";
+   dx= 2;
+   dy= 2;    
+}  
+    
+function gameOver(){
+    document.getElementById("text").innerHTML = "You lose!"; 
+    botPoints++;
+   // document.getElementById("highScore").innerHTML = "High Score: " + points;
+    if (points >= highScore){
+        highScore= points;
+        document.getElementById("highScore").innerHTML = "High Score: " + highScore;
+    }  
+    wonPointReset();
+}
+
+var ballColor= "#000000"
+    
+function drawBall() {
+    ctx.beginPath();
+    ctx.arc(x, y, ballRadius, 0, Math.PI*2);
+    ctx.fillStyle= ballColor;
+    ctx.fill();
+    ctx.closePath();
+    
+    if( y == -3 && botAlive) { //if the ball hits top border, reverse y direction and add 1 to score!
+        //dy= -dy; 
+        points ++;
+        highScoreCounter++;
+        document.getElementById("score").innerHTML = "Score: " + points;
+        wonPointReset();
+    }
+    
+    if (x + dx >= canvas.width-14 || x + dx <= 14){ //if ball hits left or right wall, reverse x dir.
+        dx= -dx;  }
+    
+    if(y + dy >= canvas.height+1){ //if ball hits bottom boundary, end game
+    gameOver();  //game ends 
+    }
+     //ball collision with player paddle
+        if(x > paddleX +10  && x < paddleX + paddleWidth -10){
+            if( y == paddleY-ballRadius){
+            dy = -dy; //bounce back vertically
+            }
+            else if(y> paddleY-ballRadius && y < paddleY +paddleHeight){
+                dy=-dy;
+            }
+        }
+        else if((x >= paddleX && x <= paddleX+10)  || (x <= paddleX + paddleWidth && x >= paddleX+paddleWidth-10)){
+             if( y == paddleY-ballRadius){
+            dy = -dy; //bounce back vertically
+            dx = -dx;
+            }
+            else if(y> paddleY-ballRadius && y < paddleY +paddleHeight){
+                dy=-dy;
+                dx=-dx;
+            }
+        }
+    //bot ball collision
+    if(botAlive && x > botpaddleX && x < botpaddleX + paddleWidth){
+            if( y == botpaddleY-ballRadius){
+            dy = -dy; //bounce back vertically
+            }
+            else if(y> botpaddleY-ballRadius && y < botpaddleY +botPaddleHeight){
+                dy=-dy;
+            }
+        }
+    else if((x >= botpaddleX && x <= botpaddleX+10)  || (x <= botpaddleX + paddleWidth && x >= botpaddleX+paddleWidth-10)){
+             if( y == botpaddleY-ballRadius){
+            dy = -dy; //bounce back vertically
+            dx = -dx;
+            }
+            else if(y> botpaddleY-ballRadius && y < botpaddleY +paddleHeight){
+                dy=-dy;
+                dx=-dx;
+            }
+        }
+    x+= dx; //ball moves to right
+    y+= dy; //ball moves down
+}    
+
+var bulletColor= "#000000";    
+
+
+function shootGun(){
+    
+    if(!gunReloaded){ //bullet ready but needs to reload first
+        reloadCounter++;
+          if(reloadCounter>=30){
+            gunReloaded=true;
+          }
+    }
+    else{
+        
+    if(!bulletAlive){ //bullet starts at player location
+    gunshotSound.play();
+    ctx.arc(paddleX+paddleWidth/2,paddleY, 5, 0, Math.PI*2);
+    bulletY=paddleY;
+    bulletX= paddleX+paddleWidth/2;
+    }
+    
+    bulletAlive= true; //then as soon as bullet is flying...
+     ctx.beginPath();
+   ctx.arc(bulletX,bulletY, 5, 0, Math.PI*2); //it gets rendered in straight line
+    ctx.fillStyle= bulletColor;
+    ctx.fill();
+    ctx.closePath();
+    
+    
+     if (bulletAlive && gunReloaded){    
+    bulletY= bulletY-4;
+    }
+    
+    if (bulletY <-5){
+        bulletAlive= false; //bullet is off screen
+        bulletY= canvas.height; //reset bullet location
+        reloadCounter=0;
+        gunReloaded=false;
+    }
+     if(botDmgTimer>=1 && botDmgTimer <=10){    
+        
+         botColor="#ff3300";
+        
+         botDmgTimer++;
+        }
+        
+        
+    //bullet collision detection
+    if ((bulletX >= botpaddleX && bulletX <= botpaddleX + paddleWidth) && (bulletY <= botpaddleY)){
+        if (botPaddleHeight <=1){ //if bot is dead
+             botPaddleHeight--;
+            botAlive= false;
+            deathGurgle.play();
+        }
+        if(botAlive){ //if bot shot and still alive...
+        console.log("Ouch!");
+        groanSound.play(); //grunt
+        botPaddleHeight--; //gets smaller
+        points++; //players earns a point
+        document.getElementById("score").innerHTML= "PlayerScore: "+ points;
+        botDmgTimer++; //bot changes color..
+            botColor="#ff3300"; 
+        }
+     
+    }
+       
+       
+    }
+    if(botDmgTimer>10){
+          botColor="#cc66ff";
+        botDmgTimer=0;
+            }
+}
+
+function instructionsDisplay(){
+    if (text1Timer <= 10000){
+    ctx.font ="30px Comic Sans MS";
+    ctx.fillStyle = "rgba(0, 0, 0, " + alpha + ")";
+    text1Timer++;
+    //console.log("alpha is " + alpha + "");   
+      //console.log("text1 timer is at "+ text1Timer);  
+    if (text1Timer >= 1700 && text1Timer <=1950){ //after 10 seconds, for 4s
+        okThisGameSucks();
+        console.log("thisgamesux called");
+    }
+    if (text1Timer >= 2200){
+        nahFuckItLoop= true;
+        console.log("fuckitloop was called");
+        instructions= false;
+    }
+    if (text1Timer <= 1000){
+    ctx.textAlign= "centered";
+    ctx.fillText("Welcome to Pong!", 110, 70);
+    
+    if(text1Timer >=150) {//1.5 second delay
+    ctx.fillText("Use the arrow keys to move", 50,125);
+    alpha= alpha- .003;
+    }
+    }
+    }
+}
+    
+function okThisGameSucks(){
+        ctx.fillStyle= "black";
+        ctx.fillText("Wow. This game kinda sucks", 50, 70);
+        
+    }   
+
+function nahFuckIt(){
+    ctx.font ="30px Comic Sans MS";
+    ctx.fillStyle= "rgba(0 ,0 ,0 , " + alpha2 + ")";
+    alpha2= alpha2- .001;
+    ctx.textAlign= "centered";
+    
+    ctx.fillText("Fuck it! Let's just kill this guy", 20, 70);
+    text2Timer++;
+    if (text2Timer >= 150){
+    ctx.fillText("Press ctrl to shoot", 90, 125);
+    }
+    //console.log("fuckit called");
+}    
+function deathDisplay(){
+    ctx.font ="30px Comic Sans MS";
+    ctx.fillStyle= "red";
+    ctx.textAlign= "center";
+    ctx.fillText("You killed him, you bastard!",canvas.width/2,canvas.height/2);
+    xfiles.play();
+    end();
+}      
+
+
+    
+function drawPaddle(){
+    ctx.beginPath();
+    ctx.fillStyle = "#0005ED";
+    ctx.rect(paddleX,paddleY, paddleWidth, paddleHeight); //render player paddle
+    // ctx.rect(paddleX,paddleY-30, paddleWidth, paddleHeight);
+    ctx.fill();
+    ctx.closePath();
+    
+    ctx.beginPath();
+    ctx.fillStyle =botColor;
+    ctx.rect(botpaddleX,botpaddleY,paddleWidth,botPaddleHeight);//render bot paddle
+    ctx.fill();
+    ctx.closePath();
+        
+    if(ctrlPressed){
+        shootGun();
+    }
+    
+      if(rightPressed && paddleX+paddleWidth <= canvas.width){ //move and constraint
+          paddleX += 3;
+    }
+        else if(leftPressed && paddleX >= 0){
+             paddleX -= 3;
+            }
+    
+    if(upPressed && paddleY >= 0){
+        paddleY -= 3;
+    //    console.log("hey up was pressed");
+    }
+        else if(downPressed && paddleY + paddleHeight + 2 <= canvas.height){
+            paddleY += 3;
+          //  console.log("hey down was pressed");
+      }  
+    //bot logic
+    
+    /////////////////
+    if(x > botpaddleX +paddleWidth/2 && botpaddleX+paddleWidth <= canvas.width){
+        botpaddleX += 6; //ball on right side and moving to right
+    }
+    if (x < botpaddleX && botpaddleX+paddleWidth +10>= 0 ){
+        botpaddleX -= 6; //ball on left side and moving to right
+    }
+//    if(x > canvas.width/2 && botpaddleX+paddleWidth <= canvas.width && dx < 0){
+//        botpaddleX -= 3; //ball on right side and moving to left
+//    }
+//    if (x < canvas.width/2 && paddleX+paddleWidth >= 0 && dx < 0){
+//        botpaddleX -= 3; //ball on left side and moving to left 
+//    }
+}    
+function draw(){
+    ctx.clearRect(0,0, canvas.width, canvas.height); //clear rectangles after rendering
+    drawBall();
+    drawPaddle();
+    if(instructions==true){
+    instructionsDisplay();
+    //setTimeout(instructionsClear(), 10);
+    }
+    if(nahFuckItLoop== true){
+        nahFuckIt();
+    }
+    if (bulletAlive){
+        shootGun();
+    }
+    if (!botAlive){
+        deathDisplay();
+    }
+}
+    
+document.addEventListener("keydown", keyDownHandler, false);
+document.addEventListener("keyup", keyUpHandler, false);
+
+function keyDownHandler(e) {
+    if(e.keyCode == 39) {
+//        leftPressed = false;
+//        upPressed = false;
+//        downPressed= false;
+        rightPressed = true;
+        
+    }
+    else if(e.keyCode == 37 ) {
+//        upPressed = false;
+//        downPressed= false;
+//        rightPressed = false;
+        leftPressed = true;
+    }
+    else if(e.keyCode == 38) {
+//          downPressed= false;
+//        rightPressed = false;
+//        leftPressed = false;
+        upPressed = true;
+        //console.log("up key pressed down is true");
+    }
+    else if(e.keyCode == 40) {
+//         rightPressed = false;
+//        leftPressed = false;
+//        upPressed = false;
+        downPressed = true;
+        //console.log("down key pressed down is true");
+    }
+    else if(e.keyCode == 17){
+        ctrlPressed = true;
+    }
+}    
+    
+function keyUpHandler(e){
+    if(e.keyCode == 39){
+        rightPressed = false;
+    }
+    if(e.keyCode == 37) {
+        leftPressed = false;
+    }
+    if (e.keyCode == 38) {
+        upPressed = false;
+        //console.log("up key was released!");
+    }
+    if(e.keyCode == 40) {
+        downPressed = false;
+        //console.log("down key was released");
+    }
+    if(e.keyCode == 17){
+        ctrlPressed = false;
+    }
+}
+
+setInterval(draw, 10); //update draw every 10 ms!
+
+ //awesome fade out function    
+function end(){
+    
+setTimeout(function() { // start a delay
+  var fade = document.getElementById("myCanvas"); // get required element
+  fade.style.opacity = 1; // set opacity for the element to 1
+  var timerId = setInterval(function() { // start interval loop
+    var opacity = fade.style.opacity; // get current opacity
+    if (opacity == 0) { // check if its 0 yet
+      clearInterval(timerId); // if so, exit from interval loop
+    } else {
+      fade.style.opacity = opacity - 0.05; // else remove 0.05 from opacity
+    }
+  }, 100); // run every 0.1 second
+}, 5000); // wait to run after 5 seconds    
+}
+</script>
+
+</body>
+</html>
