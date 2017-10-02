@@ -4,7 +4,7 @@
 
 **About this Markdown File**
 
-I built this page and learned Markdown for Software Engineering class. Credit goes to my team members for the images and research provided for flights and different days, but I learned Markdown and built this page for everyone else to type in their information. 
+I built this page and learned Markdown and Git for Software Engineering class. Credit goes to my team members for the images and research provided for flights and different days, but I learned Markdown and built this page for everyone else to type in their information. You can find the original trip page [here.](https://github.com/djpkvf/Team-4-Software-Engineering-Trip)
 
 **Project Introduction and SCRUM**
 
