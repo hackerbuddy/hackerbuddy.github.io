@@ -1,11 +1,11 @@
 # Braden's Github.io and Markdown page 
 
-## [Click here for my Github Account](https://github.com/hackerbuddy)
+## [Click Here for My Github Account](https://github.com/hackerbuddy)
 ***
 
 ***
 
-**About this Example Markdown File**
+# About this Example Markdown File
 
 Below is the page that I built for Software Engineering class. Credit goes to my team members for the images and research provided for flights and different days, but I learned Markdown and built this page for everyone else to type in their information. 
 
