@@ -2,7 +2,7 @@
 
 ## Software Engineering Project: Planning a Trip to Los Angeles, California
 
-[Looking for my github? Click here](https://github.com/hackerbuddy)
+## [Looking for my github? Click here](https://github.com/hackerbuddy)
 
 **About this Markdown File**
 
