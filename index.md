@@ -1,8 +1,12 @@
-# Team-4-Software-Engineering-Trip
+# Braden's Markdown page for Software Engineering Class
 
-## Trip to Los Angeles, California
+## Planning a Trip to Los Angeles, California
 
-**Introduction and SCRUM**
+**About this Markdown File**
+
+I built this page and learned Markdown for Software Engineering class. Credit goes to my team members for the images and research provided for flights and different days, but I learned Markdown and formatted this page for everyone else to use. 
+
+**Project Introduction and SCRUM**
 
 This is the Team 4 Github Trip project file for Software Engineering Class at Mizzou. 
 
