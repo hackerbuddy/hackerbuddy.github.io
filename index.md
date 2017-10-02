@@ -2,12 +2,19 @@
 
 ## [Click here for my Github Account](https://github.com/hackerbuddy)
 ***
+
+***
+
 **About this Example Markdown File**
 
 Below is the page that I built for Software Engineering class. Credit goes to my team members for the images and research provided for flights and different days, but I learned Markdown and built this page for everyone else to type in their information. 
 
 You can find the original trip page [here.](https://github.com/djpkvf/Team-4-Software-Engineering-Trip)
+
 ***
+
+***
+
 ## Software Engineering Project: Planning a Trip to Los Angeles, California
 
 **Project Introduction and SCRUM**
