@@ -1,10 +1,10 @@
-# Braden's Markdown page for Software Engineering Class
+# Braden's Markdown page 
 
-## Planning a Trip to Los Angeles, California
+## Software Engineering Project: Planning a Trip to Los Angeles, California
 
 **About this Markdown File**
 
-I built this page and learned Markdown for Software Engineering class. Credit goes to my team members for the images and research provided for flights and different days, but I learned Markdown and formatted this page for everyone else to use. 
+I built this page and learned Markdown for Software Engineering class. Credit goes to my team members for the images and research provided for flights and different days, but I learned Markdown and built this page for everyone else to type in their information. 
 
 **Project Introduction and SCRUM**
 
