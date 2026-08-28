@@ -1,0 +1,134 @@
+---
+layout: default
+title: "404 - Page Not Found"
+permalink: /404.html
+---
+
+<div class="container">
+  <h1>404</h1>
+  
+  <p><strong>Page not found</strong></p>
+  <p>The requested page could not be found.</p>
+  
+  <div class="suggestions">
+    <h3>Try one of these instead:</h3>
+    <ul>
+      <li><a href="/">Homepage</a></li>
+      <li><a href="/blog">Blog</a></li>
+      <li><a href="/about">About</a></li>
+      <li><a href="/projects">Projects</a></li>
+      <li><a href="/contact">Contact</a></li>
+    </ul>
+  </div>
+  
+  <div class="search">
+    <h3>Or search the site:</h3>
+    <form action="https://www.google.com/search" method="get" target="_blank">
+      <input type="hidden" name="sitesearch" value="www.armorkeeper.com">
+      <input type="text" name="q" placeholder="Search ArmorKeeper..." class="search-input">
+      <button type="submit" class="search-button">Search</button>
+    </form>
+  </div>
+</div>
+
+<style>
+.container {
+  text-align: center;
+  padding: 4rem 1rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.container h1 {
+  font-size: 4rem;
+  color: #e74c3c;
+  margin-bottom: 1rem;
+}
+
+.container p {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  color: #555;
+}
+
+.suggestions {
+  margin: 3rem 0;
+  text-align: left;
+  background: #f8f9fa;
+  padding: 2rem;
+  border-radius: 8px;
+  border-left: 4px solid #3498db;
+}
+
+.suggestions h3 {
+  margin-top: 0;
+  color: #2c3e50;
+}
+
+.suggestions ul {
+  list-style: none;
+  padding: 0;
+}
+
+.suggestions li {
+  margin: 0.5rem 0;
+}
+
+.suggestions a {
+  color: #3498db;
+  text-decoration: none;
+  font-size: 1.1rem;
+}
+
+.suggestions a:hover {
+  text-decoration: underline;
+}
+
+.search {
+  margin-top: 2rem;
+  text-align: left;
+  background: #f8f9fa;
+  padding: 2rem;
+  border-radius: 8px;
+  border-left: 4px solid #2ecc71;
+}
+
+.search h3 {
+  margin-top: 0;
+  color: #2c3e50;
+}
+
+.search-input {
+  width: 70%;
+  padding: 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  margin-right: 0.5rem;
+}
+
+.search-button {
+  padding: 0.8rem 1.5rem;
+  background: #2ecc71;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.search-button:hover {
+  background: #27ae60;
+}
+
+@media (max-width: 600px) {
+  .search-input {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+  
+  .search-button {
+    width: 100%;
+  }
+}
+</style>

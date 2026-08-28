@@ -1,0 +1,16 @@
+{%- if site.minima.social_links -%}
+  <ul class="social-media-list">
+    {%- for social in site.minima.social_links -%}
+      {%- if social.username -%}
+        <li>
+          <a href="https://{{ social.platform | escape }}.com/{{ social.username | escape }}" target="_blank" rel="noopener">
+            <svg class="svg-icon">
+              <use xlink:href="{{ '/assets/minima-social-icons.svg#' | append: social.platform | relative_url }}"></use>
+            </svg>
+            <span class="username">{{ social.username | escape }}</span>
+          </a>
+        </li>
+      {%- endif -%}
+    {%- endfor -%}
+  </ul>
+{%- endif -%}
