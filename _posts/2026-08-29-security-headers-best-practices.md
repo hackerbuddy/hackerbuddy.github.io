@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Essential Security Headers for Modern Web Applications"
-date: 2026-08-29
+date: 2026-08-28
 categories: [security, web]
 tags: [http, headers, security, web-security]
 author: Security Engineer

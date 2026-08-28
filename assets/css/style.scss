@@ -5,7 +5,7 @@
 
 // Custom styles for ArmorKeeper
 .site-header {
-  border-bottom: 1px solid $border-color;
+  border-bottom: 1px solid #e8e8e8;
   background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
   
   .site-title {
@@ -25,7 +25,7 @@
 }
 
 .site-footer {
-  border-top: 1px solid $border-color;
+  border-top: 1px solid #e8e8e8;
   background: #f8f9fa;
   padding: 2rem 0;
   margin-top: 3rem;
