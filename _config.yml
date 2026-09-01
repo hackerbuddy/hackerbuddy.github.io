@@ -18,6 +18,8 @@ plugins:
 exclude:
   - Gemfile
   - Gemfile.lock
+  - LICENSE
+  - LICENSE-CONTENT.md
   - node_modules
   - vendor/bundle/
   - vendor/cache/
