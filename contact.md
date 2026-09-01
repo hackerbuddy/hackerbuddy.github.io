@@ -1,64 +1,81 @@
 ---
-layout: page
+layout: default
 title: Contact
 permalink: /contact/
 ---
 
-# Contact ArmorKeeper
+<h1>Contact</h1>
 
-Have questions, suggestions, or want to collaborate? Here's how to reach us.
+<p>Interested in working together? Send us a message and we'll be in touch.</p>
 
-## Get in Touch
+<form id="contact-form" class="contact-form" novalidate>
+  <div class="form-group">
+    <label for="name">Name</label>
+    <input type="text" id="name" name="name" required maxlength="200" autocomplete="name" placeholder="Your name">
+  </div>
 
-### Email
-For general inquiries: **contact@armorkeeper.com**
+  <div class="form-group">
+    <label for="email">Email</label>
+    <input type="email" id="email" name="email" required maxlength="254" autocomplete="email" placeholder="you@example.com">
+  </div>
 
-### Security Reports
-For security vulnerabilities or disclosures: **security@armorkeeper.com**
+  <div class="form-group">
+    <label for="message">Message</label>
+    <textarea id="message" name="message" required maxlength="5000" rows="6" placeholder="How can we help?"></textarea>
+  </div>
 
-We follow responsible disclosure practices and will acknowledge receipt within 48 hours.
+  <div class="cf-turnstile" data-sitekey="0x4AAAAAAEkP8bIwhaTPdecN" data-theme="light"></div>
 
-### Social Media
-- **GitHub**: [github.com/hackerbuddy](https://github.com/hackerbuddy)
-- **Twitter**: [@armorkeeper](https://twitter.com/armorkeeper) (coming soon)
+  <div id="form-status" class="form-status" role="alert" aria-live="polite"></div>
 
-## Collaboration Opportunities
+  <button type="submit" class="btn btn-primary" id="submit-btn">Send Message</button>
+</form>
 
-We're always interested in:
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 
-1. **Guest Posts**: Share your security expertise
-2. **Tool Development**: Collaborate on open-source security tools
-3. **Research Partnerships**: Joint security research projects
-4. **Conference Talks**: Speaking opportunities and workshops
+<script>
+document.getElementById("contact-form").addEventListener("submit", async function(e) {
+  e.preventDefault();
 
-## Newsletter
+  const btn = document.getElementById("submit-btn");
+  const status = document.getElementById("form-status");
+  const form = e.target;
 
-Subscribe to our monthly security newsletter for:
-- Latest security research summaries
-- Tool updates and releases
-- Security event announcements
-- Exclusive content and tutorials
+  btn.disabled = true;
+  btn.textContent = "Sending...";
+  status.textContent = "";
+  status.className = "form-status";
 
-*Signup form coming soon*
+  const data = new URLSearchParams(new FormData(form));
 
-## Office Hours
+  try {
+    const resp = await fetch("https://www.armorkeeper.com/api/contact", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: data,
+    });
 
-We host virtual office hours every Friday 2-4 PM EST for:
-- Security Q&A
-- Tool demonstrations
-- Code reviews
-- Career advice in security
+    const result = await resp.json();
 
-*Calendar link coming soon*
+    if (result.success) {
+      status.textContent = result.message;
+      status.className = "form-status form-success";
+      form.reset();
+      if (typeof turnstile !== "undefined") turnstile.reset();
+    } else {
+      status.textContent = result.error || "Something went wrong. Please try again.";
+      status.className = "form-status form-error";
+    }
+  } catch (err) {
+    status.textContent = "Network error. Please try again.";
+    status.className = "form-status form-error";
+  }
 
-## Location
-
-Based in the digital realm, serving the global security community.
+  btn.disabled = false;
+  btn.textContent = "Send Message";
+});
+</script>
 
 ---
 
-**Response Time:** We aim to respond to all inquiries within 2 business days.
-
-**Privacy:** We respect your privacy and will never share your contact information without permission.
-
-*For urgent security matters, please use the security email above.*
+For vulnerability disclosure inquiries, include the program name and report reference in your message, or email [security@armorkeeper.com](mailto:security@armorkeeper.com) directly.

@@ -1,33 +1,25 @@
 ---
-layout: page
+layout: default
 title: About
 permalink: /about/
 ---
 
 # About ArmorKeeper
 
-ArmorKeeper is a security-focused blog and resource hub dedicated to helping developers, security professionals, and organizations build more secure systems.
+ArmorKeeper is a security services firm focused on offensive security, vulnerability research, and security advisory.
 
-## Our Mission
+We work with organizations that take their attack surface seriously — helping them find and fix vulnerabilities before someone else does.
 
-To provide practical, actionable security insights that bridge the gap between theoretical security concepts and real-world implementation.
+## Background
 
-## What We Cover
+Our work is grounded in hands-on vulnerability research, including contributions through major bug bounty programs and vulnerability disclosure programs. We bring that attacker mindset to every engagement.
 
-- **Security Research**: Latest vulnerabilities, exploits, and defense mechanisms
-- **Tool Guides**: Step-by-step tutorials for security tools and frameworks
-- **Best Practices**: Security standards, compliance, and operational security
-- **Case Studies**: Real-world security incidents and lessons learned
-- **Tutorials**: Hands-on security exercises and labs
+## Approach
 
-## Who We Are
-
-Founded by security practitioners with years of experience in penetration testing, application security, and infrastructure protection. We believe in sharing knowledge to make the digital world safer for everyone.
-
-## Contact
-
-Have questions or suggestions? Feel free to reach out through our [Contact page](/contact).
+- **Depth over breadth.** We focus on manual, targeted testing — not scan-and-report.
+- **Clear communication.** Findings are documented for engineers, not auditors.
+- **Ongoing partnership.** Security doesn't end with a report. We work alongside your team.
 
 ---
 
-*"Security is not a product, but a process."* - Bruce Schneier
+[See our services &rarr;](/services/) · [Read the blog &rarr;](/blog/)
