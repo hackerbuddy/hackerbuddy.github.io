@@ -16,6 +16,10 @@ plugins:
   - jekyll-seo-tag
   - jekyll-sitemap
 
+# Include dotfiles/dotfolders
+include:
+  - .well-known
+
 # Exclude from processing
 exclude:
   - Gemfile
@@ -46,4 +50,5 @@ defaults:
 
 # Sass
 sass:
+  quiet_deps: true
   style: compressed
