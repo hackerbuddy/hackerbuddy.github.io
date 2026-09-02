@@ -114,3 +114,5 @@ AI coding assistants are accumulating the same kind of ambient authority that br
 ---
 
 *This research was conducted under the AWS Vulnerability Disclosure Program. The report was submitted via [HackerOne](https://hackerone.com) and disclosure was authorized by AWS.*
+
+*Payloads, defense patterns, and additional LLM tool-call injection research are maintained at [github.com/hackerbuddy/llm-tool-injections](https://github.com/hackerbuddy/llm-tool-injections).*
